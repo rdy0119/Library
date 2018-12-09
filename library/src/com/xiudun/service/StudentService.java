@@ -61,7 +61,10 @@ public interface StudentService {
 	 * 借书
 	 */
 	void borrow(String sid,String bid);
-	
+	/**
+	 * 还书
+	 */
+	void returnBook(String sid,String bid);
 }
 
 

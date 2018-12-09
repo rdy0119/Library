@@ -265,6 +265,50 @@ public class StudentServiceImpl implements StudentService {
 		}
 		return array;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.xiudun.service.StudentService#returnBook(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void returnBook(String sid, String bid) {
+
+		//根据学生的id查找对应的数据文件(xxx.properties)
+		File file = findById(sid);
+		if(file !=null) {
+			//找到了
+			try(InputStream in = new FileInputStream(file);
+				OutputStream out = new FileOutputStream(file)){
+				pro.load(in);
+				//实际就是更新原来的内容,为了保持原来的值
+				String old = pro.getProperty("bag");
+				String[] booksId=old.split(",");
+				for(int i=0; i<booksId.length;i++)
+				{
+					if(bid.equals(booksId[i]))
+					{
+						for(int j=i;j<booksId.length-1;j++)
+						{
+							booksId[j]=booksId[j+1];
+						}
+				    booksId[booksId.length-1]="";
+					}
+				}
+				String newB="";
+				for(String  id:booksId)
+				{
+					if(id!="")
+						newB=id+",";
+				}
+
+				pro.setProperty("bag", newB);
+
+				pro.store(out, "");				
+			}catch(Exception e) {e.printStackTrace();}
+		}
+		
+	
+		
+	}
 }
 
 

@@ -19,8 +19,8 @@ public class BookAction {
 		bookService.saveBook(book);
 	}
 	//修改
-	public void update(Book book) {
-		bookService.update(book);
+	public Boolean update(Book book) {
+		return bookService.update(book);
 	}
 	//删除
 	public void delete(String id) {

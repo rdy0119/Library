@@ -35,7 +35,7 @@ public interface BookService {
 	/**
 	 * 更新
 	 */
-	void update(Book book);
+	Boolean update(Book book);
 	/**
 	 * 获取所有的数据
 	 */

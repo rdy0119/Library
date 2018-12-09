@@ -68,7 +68,7 @@ public class StudentPage {
 	private JTextField sid;
 	private void initialize() {
 		frame = new JFrame();
-		frame.setTitle("学生");
+		frame.setTitle("学生及借还书管理");
 		frame.setBounds(100, 100, 1256, 719);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -96,7 +96,7 @@ public class StudentPage {
 		frame.getContentPane().add(age);
 		
 		sid = new JTextField();
-		sid.setBounds(226, 62, 382, 24);
+		sid.setBounds(131, 272, 382, 24);
 		frame.getContentPane().add(sid);
 		sid.setColumns(10);
 		
@@ -122,13 +122,15 @@ public class StudentPage {
 						"id", "姓名", "性别", "年龄", "书包"
 					}
 				));
+				username.setText("");
+				age.setText("");
 			}
 		});
 		button.setBounds(809, 13, 113, 27);
 		frame.getContentPane().add(button);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(55, 111, 1145, 171);
+		scrollPane_1.setBounds(48, 62, 1145, 171);
 		frame.getContentPane().add(scrollPane_1);
 		
 		table = new JTable();
@@ -136,17 +138,62 @@ public class StudentPage {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				//把选中的学生id添加到sid控件中
-				sid.setText(table.getValueAt(table.getSelectedRow(), 0).toString());	
+				sid.setText(table.getValueAt(table.getSelectedRow(), 0).toString());
+				Object[][] myBook=studentAction.detail(sid.getText());
 				table_1.setModel(new DefaultTableModel(
-						studentAction.detail(sid.getText()),
+						myBook,
+						new String[] {
+							"id", "图书名称", "作者", "单价"
+						}
+				));
+				Object[][] allBook=bookAction.findAll();
+				Object[][] otherBook=new Object[100][];
+				int l=0;
+				if(myBook.length>0)
+				{
+					System.out.println("============================mybooklength"+myBook.length);
+					for(Object[] o:allBook)
+					{
+						int flag=0;
+						for(Object[] m:myBook)
+						{
+							if(o[0].equals(m[0]))
+								flag++;
+						}
+						if(flag==0)
+						{
+							otherBook[l]=o;
+							l++;
+						}
+								
+					}
+					
+				}else {
+					otherBook=allBook;
+				}
+				System.out.println("======================="+otherBook.length);
+				table_2.setModel(new DefaultTableModel(
+						otherBook,
 						new String[] {
 							"id", "图书名称", "作者", "单价"
 						}
 				));
 			}
 		});
+		Object[][] studentsInshort=studentAction.findAll();
+		for(Object[] student:studentsInshort)
+		{
+			
+			if(student[4].toString().equals("[]"))
+			{
+				student[4]="空";
+			}
+			else {
+				student[4]="有借书记录";
+			}
+		}
 		table.setModel(new DefaultTableModel(
-				studentAction.findAll(),
+				studentsInshort,
 			new String[] {
 				"id", "姓名", "性别", "年龄", "书包"
 			}
@@ -154,7 +201,7 @@ public class StudentPage {
 		scrollPane_1.setViewportView(table);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(65, 307, 1156, 136);
+		scrollPane.setBounds(48, 306, 1166, 136);
 		frame.getContentPane().add(scrollPane);
 		
 		table_1 = new JTable();
@@ -177,7 +224,7 @@ public class StudentPage {
 		frame.getContentPane().add(button_1);
 		
 		JScrollPane scrollPane_2 = new JScrollPane();
-		scrollPane_2.setBounds(65, 489, 1159, 154);
+		scrollPane_2.setBounds(48, 496, 1166, 154);
 		frame.getContentPane().add(scrollPane_2);
 		
 		table_2 = new JTable();
@@ -187,30 +234,226 @@ public class StudentPage {
 				//双击事件
 				if(e.getClickCount()==2) {
 					studentAction.borrow(sid.getText(), 
-							table_2.getValueAt(table_2.getSelectedRow(), 0).toString());
+					table_2.getValueAt(table_2.getSelectedRow(), 0).toString());
 				}
 			}
 		});
-		table_2.setModel(new DefaultTableModel(
-			bookAction.findAll(),
-			new String[] {
-					"id", "图书名称", "作者", "单价"
-			}
-		));
+//		table_2.setModel(new DefaultTableModel(
+//			bookAction.findAll(),
+//			new String[] {
+//			"id", "图书名称", "作者", "单价"
+//		}
+//		));
 		scrollPane_2.setViewportView(table_2);
 		
-		JLabel label_2 = new JLabel("学生信息");
-		label_2.setBounds(48, 80, 72, 18);
+		JLabel lblNewLabel_1 = new JLabel("有借书记录不允许删除");
+		lblNewLabel_1.setBounds(761, 247, 129, 15);
+		frame.getContentPane().add(lblNewLabel_1);
+		lblNewLabel_1.setVisible(false);
+		
+		JLabel label_2 = new JLabel("学生ID");
+		label_2.setBounds(48, 274, 72, 18);
 		frame.getContentPane().add(label_2);
 		
-		JLabel label_3 = new JLabel("书包");
-		label_3.setBounds(0, 284, 72, 18);
+	   JLabel label_3 = new JLabel("书包");
+		label_3.setBounds(10, 306, 72, 18);
 		frame.getContentPane().add(label_3);
 		
-		JLabel label_4 = new JLabel("图书馆");
-		label_4.setBounds(0, 456, 72, 18);
+//		JLabel label_4 = new JLabel("图书馆");
+//		label_4.setBounds(0, 540, 72, 18);
+//		frame.getContentPane().add(label_4);
+		
+		JButton btnNewButton = new JButton("删除");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+	              int[] rows=table.getSelectedRows(); 
+	              for(int row:rows)
+	              {
+	            	String  id= (String) table.getValueAt(row, 0);
+
+	            	if(studentAction.detail(id).length>0)
+	            	{
+	            		lblNewLabel_1.setVisible(true);
+	            	}else {
+	            		studentAction.delete(id);
+	            	}
+	            	
+	              }
+	            Object[][] studentsInshort=studentAction.findAll();
+	      		for(Object[] student:studentsInshort)
+	      		{
+	      			
+	      			if(student[4].toString().equals("[]"))
+	      			{
+	      				student[4]="空";
+	      			}
+	      			else {
+	      				student[4]="有借书记录";
+	      			}
+	      		}
+				//显示
+				table.setModel(new DefaultTableModel(
+						studentsInshort,
+					new String[] {
+						"id", "姓名", "性别", "年龄", "书包"
+					}
+				));	
+				sid.setText("");			
+			}
+		});
+		btnNewButton.setBounds(900, 243, 93, 23);
+		frame.getContentPane().add(btnNewButton);
+		
+		JButton btnNewButton_1 = new JButton("修改");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int row=table.getSelectedRow();
+				String id= (String) table.getValueAt(row, 0);
+				String name= (String) table.getValueAt(row,1);
+				String sex= (String) table.getValueAt(row, 2);
+				String age= (String) table.getValueAt(row, 3);
+				String[] str= {id,name,sex,age};
+				StudentEdit sEdit=new StudentEdit(str);
+				sEdit.main(str);
+			}
+		});
+		btnNewButton_1.setBounds(1021, 243, 93, 23);
+		frame.getContentPane().add(btnNewButton_1);
+		
+		JButton btnNewButton_2 = new JButton("刷新");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				lblNewLabel_1.setVisible(false);
+				Object[][] studentsInshort=studentAction.findAll();
+				for(Object[] student:studentsInshort)
+				{
+					
+					if(student[4].toString().equals("[]"))
+					{
+						student[4]="空";
+					}
+					else {
+						student[4]="有借书记录";
+					}
+				}
+				table.setModel(new DefaultTableModel(
+						studentsInshort,
+					new String[] {
+						"id", "姓名", "性别", "年龄", "书包"
+					}
+				));
+			}
+		});
+		btnNewButton_2.setBounds(1124, 243, 93, 23);
+		frame.getContentPane().add(btnNewButton_2);
+		
+		JLabel label_4 = new JLabel("可借图书");
+		label_4.setBounds(0, 503, 54, 15);
 		frame.getContentPane().add(label_4);
 		
+		JButton button_2 = new JButton("还书");
+		button_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				studentAction.returnB(sid.getText(), 
+				table_1.getValueAt(table_1.getSelectedRow(), 0).toString());
+				Object[][] myBook=studentAction.detail(sid.getText());
+				table_1.setModel(new DefaultTableModel(
+						myBook,
+						new String[] {
+							"id", "图书名称", "作者", "单价"
+						}
+				));
+				Object[][] allBook=bookAction.findAll();
+				Object[][] otherBook=new Object[100][];
+				int l=0;
+				if(myBook.length>0)
+				{
+					System.out.println("============================mybooklength"+myBook.length);
+					for(Object[] o:allBook)
+					{
+						int flag=0;
+						for(Object[] m:myBook)
+						{
+							if(o[0].equals(m[0]))
+								flag++;
+						}
+						if(flag==0)
+						{
+							otherBook[l]=o;
+							l++;
+						}
+								
+					}
+					
+				}else {
+					otherBook=allBook;
+				}
+				System.out.println("======================="+otherBook.length);
+				table_2.setModel(new DefaultTableModel(
+						otherBook,
+						new String[] {
+							"id", "图书名称", "作者", "单价"
+						}
+				));
+			
+				
+			}
+		});
+		button_2.setBounds(1121, 452, 93, 23);
+		frame.getContentPane().add(button_2);
+		
+		JButton button_3 = new JButton("借书");
+		button_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				studentAction.borrow(sid.getText(), 
+				table_2.getValueAt(table_2.getSelectedRow(), 0).toString());
+				Object[][] myBook=studentAction.detail(sid.getText());
+				table_1.setModel(new DefaultTableModel(
+						myBook,
+						new String[] {
+							"id", "图书名称", "作者", "单价"
+						}
+				));
+				Object[][] allBook=bookAction.findAll();
+				Object[][] otherBook=new Object[100][];
+				int l=0;
+				if(myBook.length>0)
+				{
+					System.out.println("============================mybooklength"+myBook.length);
+					for(Object[] o:allBook)
+					{
+						int flag=0;
+						for(Object[] m:myBook)
+						{
+							if(o[0].equals(m[0]))
+								flag++;
+						}
+						if(flag==0)
+						{
+							otherBook[l]=o;
+							l++;
+						}
+								
+					}
+					
+				}else {
+					otherBook=allBook;
+				}
+				System.out.println("======================="+otherBook.length);
+				table_2.setModel(new DefaultTableModel(
+						otherBook,
+						new String[] {
+							"id", "图书名称", "作者", "单价"
+						}
+				));
+			}
+		});
+		button_3.setBounds(1124, 658, 93, 23);
+		frame.getContentPane().add(button_3);
+		
+
 		
 	}
 }

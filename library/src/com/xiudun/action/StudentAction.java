@@ -20,6 +20,11 @@ public class StudentAction {
 	public void save(Student s) {
 		service.saveStudent(s);
 	}
+	
+	public void delete(String id)
+	{
+		service.deleteStudent(id);
+	}
 	//显示
 	public Object[][] findAll(){
 		return service.findAll();
@@ -29,12 +34,22 @@ public class StudentAction {
 	public void borrow(String sid,String bid) {
 		service.borrow(sid, bid);
 	}
+	//借书
+	public void returnB(String sid,String bid) {
+		service.returnBook(sid, bid);
+	}
 	//查看明细
 	public Object[][] detail(String sid){
 		if(sid!=null)
 			return service.findAllBag(sid);
 		return null;
 	}
+	
+	public void update(Student student) 
+	{
+		service.update(student);
+	}
+	
 }
 
 

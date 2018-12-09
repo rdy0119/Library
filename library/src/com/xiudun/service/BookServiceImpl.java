@@ -78,7 +78,8 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public void update(Book book) {
+	public Boolean update(Book book) {
+		Boolean flag=false;
 		File file = findById(book.getId());
 		if(file !=null) {
 			//使用后及时关闭
@@ -91,12 +92,15 @@ public class BookServiceImpl implements BookService {
 				pro.setProperty("price",String.valueOf(book.getPrice()));			
 				//把book对象中的值，按照key-value的形式添加到对应的资源文件中保存
 				pro.store(out, "book info");
+				flag=true;
+				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		return flag;
 	}
 
 	@Override

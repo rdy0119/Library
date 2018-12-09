@@ -78,8 +78,6 @@ public class MainPage {
 					node_1 = new DefaultMutableTreeNode("功能操作");
 						node_1.add(new DefaultMutableTreeNode("图书"));
 						node_1.add(new DefaultMutableTreeNode("学生"));
-						node_1.add(new DefaultMutableTreeNode("red"));
-						node_1.add(new DefaultMutableTreeNode("yellow\t"));
 					add(node_1);
 				}
 			}
