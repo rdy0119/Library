@@ -282,24 +282,16 @@ public class StudentServiceImpl implements StudentService {
 				//实际就是更新原来的内容,为了保持原来的值
 				String old = pro.getProperty("bag");
 				String[] booksId=old.split(",");
+				String newB="";
 				for(int i=0; i<booksId.length;i++)
 				{
-					if(bid.equals(booksId[i]))
-					{
-						for(int j=i;j<booksId.length-1;j++)
-						{
-							booksId[j]=booksId[j+1];
-						}
-				    booksId[booksId.length-1]="";
-					}
+					if(bid.equals(booksId[i])||booksId[i].equals(""))
+						continue;
+						newB=newB+booksId[i]+",";
 				}
-				String newB="";
-				for(String  id:booksId)
-				{
-					if(id!="")
-						newB=id+",";
-				}
-
+				System.out.println("bid"+bid);
+				System.out.println("oldB"+old);
+                System.out.println("newB"+newB);
 				pro.setProperty("bag", newB);
 
 				pro.store(out, "");				
